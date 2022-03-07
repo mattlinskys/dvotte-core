@@ -73,11 +73,11 @@ contract DVotte is Ownable {
         emit Dovoted(msg.sender, msg.value, note);
     }
 
-    function share() external onlyOwner {
+    function share() external onlyMember {
         _share();
     }
 
-    function shareAndReleaseAll() external onlyOwner {
+    function shareAndReleaseAll() external onlyMember {
         _share();
         _releaseAll();
     }
