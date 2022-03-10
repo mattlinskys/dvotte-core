@@ -84,7 +84,7 @@ contract DVotte is Ownable {
 
     function _share() private {
         require(balance > 0);
-        require(members.length() < balance);
+        require(members.length() <= balance);
 
         uint256 sharePart = balance / members.length();
 
