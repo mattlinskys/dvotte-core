@@ -19,10 +19,13 @@ contract DVotte is Ownable {
 
     EnumerableSet.AddressSet private members;
     mapping(address => uint256) public membersBalances;
+
     uint256 public balance;
+    uint256 public total;
 
     uint256 public releaseThreshold;
     uint256 public releaseThresholdUpdatedAt;
+
     bool public isDisabled;
 
     constructor(uint256 _releaseThreshold, address[] memory _members) {
@@ -47,6 +50,8 @@ contract DVotte is Ownable {
 
     receive() external payable onlyActive {
         balance += msg.value;
+        total += msg.value;
+
         emit Devoted(msg.sender, msg.value, block.timestamp, "");
     }
 
@@ -68,13 +73,17 @@ contract DVotte is Ownable {
 
     function setReleaseThreshold(uint256 _releaseThreshold) external onlyOwner {
         require(block.timestamp - releaseThresholdUpdatedAt > 1 days);
+
         releaseThreshold = _releaseThreshold;
         releaseThresholdUpdatedAt = block.timestamp;
     }
 
     function devote(string calldata note) external payable onlyActive {
         require(msg.value > 0);
+
         balance += msg.value;
+        total += msg.value;
+
         emit Devoted(msg.sender, msg.value, block.timestamp, note);
     }
 
