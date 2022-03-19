@@ -48,11 +48,26 @@ describe("DVotte", () => {
 
   it("Should add devoted value to balance", async () => {
     const value = ethers.utils.parseEther("1");
+    const [signer] = await ethers.getSigners();
     const balance = (await dvotte.balance()) as BigNumber;
+    const logsCount = (await dvotte.queryFilter(dvotte.filters.Devoted(), 0))
+      .length;
 
-    await dvotte.devote("", { value });
+    await dvotte.devote("Note", { value });
+    await (
+      await signer.sendTransaction({
+        from: signer.address,
+        to: dvotte.address,
+        value,
+      })
+    ).wait();
 
-    expect(await dvotte.balance()).to.equal(balance.add(value));
+    await expect(await dvotte.balance()).to.equal(balance.add(value.mul(2)));
+    await expect(
+      (
+        await dvotte.queryFilter(dvotte.filters.Devoted(), 0)
+      ).length
+    ).to.equal(logsCount + 2);
   });
 
   it("Should share balance between members", async () => {
@@ -73,7 +88,6 @@ describe("DVotte", () => {
 
   it("Should release balance to members", async () => {
     const members = ((await dvotte.getMembers()) as string[]).slice().reverse();
-    console.log(members);
 
     const getBalancesToRelease = async () =>
       (await Promise.all(
