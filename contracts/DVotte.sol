@@ -10,12 +10,7 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 contract DVotte is Ownable {
     using EnumerableSet for EnumerableSet.AddressSet;
 
-    event Devoted(
-        address indexed devoter,
-        uint256 indexed value,
-        uint256 indexed time,
-        string note
-    );
+    event Devoted(address indexed devoter, uint256 value);
 
     EnumerableSet.AddressSet private members;
     mapping(address => uint256) public membersBalances;
@@ -52,7 +47,7 @@ contract DVotte is Ownable {
         balance += msg.value;
         total += msg.value;
 
-        emit Devoted(msg.sender, msg.value, block.timestamp, "");
+        emit Devoted(msg.sender, msg.value);
     }
 
     function getMembers() external view returns (address[] memory) {
@@ -76,15 +71,6 @@ contract DVotte is Ownable {
 
         releaseThreshold = _releaseThreshold;
         releaseThresholdUpdatedAt = block.timestamp;
-    }
-
-    function devote(string calldata note) external payable onlyActive {
-        require(msg.value > 0);
-
-        balance += msg.value;
-        total += msg.value;
-
-        emit Devoted(msg.sender, msg.value, block.timestamp, note);
     }
 
     function share() external onlyMember {

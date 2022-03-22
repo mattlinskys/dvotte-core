@@ -53,7 +53,6 @@ describe("DVotte", () => {
     const logsCount = (await dvotte.queryFilter(dvotte.filters.Devoted(), 0))
       .length;
 
-    await dvotte.devote("Note", { value });
     await (
       await signer.sendTransaction({
         from: signer.address,
@@ -62,19 +61,25 @@ describe("DVotte", () => {
       })
     ).wait();
 
-    await expect(await dvotte.balance()).to.equal(balance.add(value.mul(2)));
+    await expect(await dvotte.balance()).to.equal(balance.add(value));
     await expect(
       (
         await dvotte.queryFilter(dvotte.filters.Devoted(), 0)
       ).length
-    ).to.equal(logsCount + 2);
+    ).to.equal(logsCount + 1);
   });
 
   it("Should share balance between members", async () => {
-    const [, memberToAdd] = await ethers.getSigners();
+    const [signer, memberToAdd] = await ethers.getSigners();
 
     await dvotte.addMember(memberToAdd.address);
-    await dvotte.devote("", { value: ethers.utils.parseEther("1") });
+    await (
+      await signer.sendTransaction({
+        from: signer.address,
+        to: dvotte.address,
+        value: ethers.utils.parseEther("1"),
+      })
+    ).wait();
 
     const balance = await dvotte.balance();
     await dvotte.share();
