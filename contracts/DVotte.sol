@@ -114,7 +114,7 @@ contract DVotte is Ownable {
         require(sent);
     }
 
-    function releaseAll() external onlyOwner {
+    function releaseAll() external onlyMember {
         _releaseAll();
     }
 
